@@ -7,9 +7,11 @@ app = Flask(__name__)
 def base():
     return render_template("base.html")
 
+
 @app.route("/add")
 def add():
     return render_template("add.html")
+
 
 @app.route("/lookup/<barcode>")
 def lookup(barcode):
