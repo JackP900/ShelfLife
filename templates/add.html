@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <div id="reader" style="width:600px"></div>
+    <script src="{{ url_for('static', filename='scanner.js') }}" defer></script>
+{% endblock %}
