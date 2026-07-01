@@ -36,7 +36,7 @@ def lookup(barcode):
     return jsonify(off_lookup(barcode))
 
 
-@app.route("reprice/<product_id>", methods=["POST"])
+@app.route("/reprice/<product_id>", methods=["GET"])
 def reprice(product_id):
     product = get_product(product_id)
 

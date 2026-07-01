@@ -77,9 +77,9 @@ def get_products_with_urgency():
     return result
 
 def get_product(product_id):
-    conn = sqlite3.connect("shelflife.db")
+    conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("SELECT FROM products WHERE id = ?", (product_id))
+    cursor.execute("SELECT * FROM products WHERE id = ?", (product_id,))
     product = cursor.fetchone()
     conn.close()
     return product
