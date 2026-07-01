@@ -37,7 +37,7 @@ def get_db():
     return conn
 
 def add_product(barcode, name, category, original_price, expiry_date, stock):
-    conn = sqlite3.connect("shelflife.db")
+    conn = get_db()
     cursor = conn.cursor()
     cursor.execute(""" 
         INSERT INTO products (barcode, name, category, original_price, current_price, expiry_date, stock, added_at)
@@ -83,6 +83,26 @@ def get_product(product_id):
     product = cursor.fetchone()
     conn.close()
     return product
+
+
+def update_price(product_id, new_price):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE products SET current_price = ? WHERE id = ?", (new_price, product_id,))
+    conn.commit()
+    conn.close()
+
+
+def log_price_update(product_id, old_price, new_price, reasoning):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO price_updates (product_id, old_price, new_price, reasoning, timestamp)
+        VALUES (?, ?, ?, ?, ?)
+    """, (product_id, old_price, new_price, reasoning, datetime.now().isoformat()))
+    conn.commit()
+    conn.close()
+
 
 
 

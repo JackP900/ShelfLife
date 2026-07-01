@@ -1,6 +1,6 @@
 from flask import Flask, render_template, jsonify, request
 from off_lookup import off_lookup
-from db import add_product, get_products_with_urgency, get_product
+from db import add_product, get_products_with_urgency, get_product, update_price, log_price_update
 from datetime import datetime
 from pricing import get_price
 
@@ -36,7 +36,7 @@ def lookup(barcode):
     return jsonify(off_lookup(barcode))
 
 
-@app.route("/reprice/<product_id>", methods=["GET"])
+@app.route("/reprice/<int:product_id>", methods=["POST"])
 def reprice(product_id):
     product = get_product(product_id)
 
@@ -59,6 +59,12 @@ def reprice(product_id):
         product["stock"],
         time_of_day
     )
+
+    old_price = product["current_price"]
+    new_price = results["price"]
+
+    update_price(product_id, new_price)
+    log_price_update(product_id, old_price, new_price, results["reasoning"])
 
     return jsonify(results)
 
