@@ -1,7 +1,7 @@
 async function onScanSuccess(decodedText, decodedResult) {
     scanner.clear()
-    const responce = await fetch(`/lookup/${decodedText}`);
-    const data = await responce.json();
+    const response = await fetch(`/lookup/${decodedText}`);
+    const data = await response.json();
     console.log(data);
 
     document.getElementById("name").value = data.name;
@@ -11,6 +11,31 @@ async function onScanSuccess(decodedText, decodedResult) {
     document.getElementById("product-form").style.display = "block";
 }
 
+async function handleAddProduct(){
+
+    const originalPrice = document.getElementById("original_price").value;
+    const expiry = document.getElementById("expiry").value;
+    const stock = document.getElementById("stock").value;
+    const barcode = document.getElementById("barcode").value;
+    const name = document.getElementById("name").value;
+    const category = document.getElementById("category").value;
+
+    console.log("name:", name, "category:", category, "barcode:", barcode, "Stock:", stock, "Expiry:", expiry, "Original Price:", originalPrice)
+
+    const product = {name, category, barcode, stock, expiry, original_price: originalPrice}
+
+    const response = await fetch("/save", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(product)
+    });
+
+    const result = await response.json();
+    console.log(result);
+
+}
+
+document.getElementById("submit_button").addEventListener("click", handleAddProduct)
 
 
 function onScanFailure(error) {

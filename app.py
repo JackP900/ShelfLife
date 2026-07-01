@@ -1,5 +1,6 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 from off_lookup import off_lookup
+from db import add_product
 
 app = Flask(__name__)
 
@@ -11,6 +12,20 @@ def base():
 @app.route("/add")
 def add():
     return render_template("add.html")
+
+
+@app.route("/save", methods=["POST"])
+def save():
+    data = request.get_json()
+    add_product(
+        data["barcode"],
+        data["name"],
+        data["category"],
+        float(data["original_price"]),
+        data["expiry"],
+        int(data["stock"])
+    )
+    return jsonify({"status": "saved"})
 
 
 @app.route("/lookup/<barcode>")
