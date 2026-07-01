@@ -1,6 +1,8 @@
 from flask import Flask, render_template, jsonify, request
 from off_lookup import off_lookup
-from db import add_product, get_products_with_urgency
+from db import add_product, get_products_with_urgency, get_product
+from datetime import datetime
+from pricing import get_price
 
 app = Flask(__name__)
 
@@ -33,6 +35,32 @@ def save():
 def lookup(barcode):
     return jsonify(off_lookup(barcode))
 
+
+@app.route("reprice/<product_id>", methods=["POST"])
+def reprice(product_id):
+    product = get_product(product_id)
+
+    hour = datetime.now().hour
+    if hour < 12:
+        time_of_day = "morning"
+    elif hour < 17:
+        time_of_day = "afternoon"
+    else:
+        time_of_day = "evening"
+
+    expiry = datetime.strptime(product["expiry_date"], "%Y-%m-%d")
+    days_left = (expiry - datetime.now()).days
+
+    results = get_price(
+        product["name"],
+        product["category"],
+        product["original_price"],
+        days_left,
+        product["stock"],
+        time_of_day
+    )
+
+    return jsonify(results)
 
 if __name__ == "__main__":
     app.run(debug=True)
