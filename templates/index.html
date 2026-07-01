@@ -5,8 +5,11 @@
 
     {% for product in products %}
         <div class="product {{ product.urgency }}">
+            <button class="reprice-btn" data-id="{{ product.id }}">Reprice</button>
             {{ product.name }} - ￡{{ product.current_price }} - {{ product.stock }} in stock - 
             expires in {{ product.days_left }} days
         </div>
     {% endfor %}
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}" defer></script>
 {% endblock %}
