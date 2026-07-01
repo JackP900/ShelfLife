@@ -63,7 +63,7 @@ def reprice(product_id):
     old_price = product["current_price"]
     new_price = results["price"]
 
-    update_price(product_id, new_price)
+    update_price(product_id, results["reasoning"], new_price)
     log_price_update(product_id, old_price, new_price, results["reasoning"])
 
     return jsonify(results)

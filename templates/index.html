@@ -1,15 +1,41 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Inventory</h1>
-
-    {% for product in products %}
-        <div class="product {{ product.urgency }}">
-            <button class="reprice-btn" data-id="{{ product.id }}">Reprice</button>
-            {{ product.name }} - ￡{{ product.current_price }} - {{ product.stock }} in stock - 
-            expires in {{ product.days_left }} days
+    <header class="masthead">
+        <div class="masthead-title">
+            <span class="wordmark">SHELFLIFE</span>
+            <span class="tagline">reduce to clear · before it's binned</span>
         </div>
-    {% endfor %}
+        <a href="/add" class="ticket-add">+ Add stock</a>
+    </header>
+
+    <div class="shelf">
+        {% for product in products %}
+            <article class="ticket ticket--{{ product.urgency }}">
+                <div class="ticket-top">
+                    <span class="ticket-name">{{ product.name }}</span>
+                    <span class="ticket-days">{{ product.days_left }}d</span>
+                </div>
+
+                <div class="ticket-price">
+                    {% if product.current_price < product.original_price %}
+                        <span class="was">£{{ "%.2f"|format(product.original_price) }}</span>
+                        <span class="arrow">→</span>
+                    {% endif %}
+                    <span class="now">£{{ "%.2f"|format(product.current_price) }}</span>
+                </div>
+
+                <div class="ticket-foot">
+                    <span class="stock">{{ product.stock }} in stock</span>
+                    <button class="reprice-btn" data-id="{{ product.id }}">Reprice</button>
+                </div>
+
+                {% if product.reasoning %}
+                    <p class="ticket-note">{{ product.reasoning }}</p>
+                {% endif %}
+            </article>
+        {% endfor %}
+    </div>
 
     <script src="{{ url_for('static', filename='js/dashboard.js') }}" defer></script>
 {% endblock %}

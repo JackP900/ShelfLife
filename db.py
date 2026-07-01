@@ -14,7 +14,9 @@ def init_db():
             original_price REAL,
             current_price REAL,
             stock INTEGER,
-            added_at TEXT)
+            reasoning TEXT,
+            added_at TEXT
+            )
     """)
 
     cursor.execute("""
@@ -85,10 +87,10 @@ def get_product(product_id):
     return product
 
 
-def update_price(product_id, new_price):
+def update_price(product_id, reasoning, new_price):
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("UPDATE products SET current_price = ? WHERE id = ?", (new_price, product_id,))
+    cursor.execute("UPDATE products SET current_price = ?, reasoning = ? WHERE id = ?", (new_price, reasoning, product_id,))
     conn.commit()
     conn.close()
 
