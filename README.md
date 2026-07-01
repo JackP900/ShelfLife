@@ -2,13 +2,15 @@
 
 Built at BeanHacks.
 
+Sell it before you bin it.
+
 Coffee shops and grocers throw out a lot of food that was fine to sell an hour earlier. The problem is timing: nobody wants to manually re-tag the price on a carton of milk every few hours as it creeps toward its expiry date, so it either sells at full price or ends up in the bin.
 
 ShelfLife handles that re-tagging for you. Scan a product, tell it when the item expires, and it decides how much to discount as the clock runs down. The markdown gets deeper as an item gets closer to expiry, has more stock sitting around, or the shop gets closer to closing time. The goal is to sell the thing before it's binned without slashing the price more than you have to.
 
 ## How it works
 
-You scan a barcode with your phone or webcam. ShelfLife looks the product up in Open Food Facts to pre-fill the name and category, then you add the price, expiry date, and how much stock you have.
+You scan a barcode with your webcam. (Phone scanning works too, but the browser only allows camera access over HTTPS, so you'd need to serve it over a tunnel rather than plain localhost.). ShelfLife looks the product up in Open Food Facts to pre-fill the name and category, then you add the price, expiry date, and how much stock you have.
 
 On the dashboard, every product shows up as a shelf ticket colour-coded by urgency: green if you've got more than five days, amber inside five days, red at two days or fewer. Hit "Reprice" and the app sends the product's details to Claude, which returns a new price and a one-line explanation of why. There's a hard floor at 30% of the original price and a ceiling at the original price, so the model can't do anything silly. Every price change gets logged so you can see the history.
 
@@ -48,7 +50,7 @@ python seed.py
 Then start the server:
 
 ```bash
-flask run
+python app.py
 # or: python app.py
 ```
 
