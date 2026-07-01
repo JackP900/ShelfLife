@@ -17,8 +17,19 @@ def init_db():
             added_at TEXT)
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS price_updates (
+            id INTEGER PRIMARY KEY,
+            product_id INTEGER,
+            old_price REAL,
+            new_price REAL,
+            reasoning TEXT,
+            timestamp TEXT)
+    """)
+
     conn.commit()
     conn.close()
+
 
 def get_db():
     conn = sqlite3.connect("shelflife.db")
@@ -63,8 +74,15 @@ def get_products_with_urgency():
         p["days_left"] = days_left
         result.append(p)
     
-    print(result)
     return result
+
+def get_get_product(product_id):
+    conn = sqlite3.connect("shelflife.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT FROM products WHERE id = ?", (product_id))
+    product = cursor.fetchone()
+    conn.close()
+    return product
 
 
 

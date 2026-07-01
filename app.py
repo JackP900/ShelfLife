@@ -1,12 +1,13 @@
 from flask import Flask, render_template, jsonify, request
 from off_lookup import off_lookup
-from db import add_product
+from db import add_product, get_products_with_urgency
 
 app = Flask(__name__)
 
 @app.route("/")
-def base():
-    return render_template("base.html")
+def index():
+    products = get_products_with_urgency()
+    return render_template("index.html", products=products)
 
 
 @app.route("/add")
