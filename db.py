@@ -21,7 +21,9 @@ def init_db():
     conn.close()
 
 def get_db():
-    return sqlite3.connect("shelflife.db")
+    conn = sqlite3.connect("shelflife.db")
+    conn.row_factory = sqlite3.Row
+    return conn
 
 def add_product(barcode, name, category, original_price, expiry_date, stock):
     conn = sqlite3.connect("shelflife.db")
@@ -33,4 +35,37 @@ def add_product(barcode, name, category, original_price, expiry_date, stock):
     
     conn.commit()
     conn.close()
+
+def get_all_products():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM products")
+    products = cursor.fetchall()
+    conn.close()
+    return products
+
+def get_products_with_urgency():
+    products = get_all_products()
+    result = []
+    
+    for product in products:
+        p = dict(product)
+
+        expiry = datetime.strptime(p["expiry_date"], "%Y-%m-%d")
+        days_left = (expiry - datetime.now()).days
+        if days_left <= 2:
+            p["urgency"] = "red"
+        elif days_left <=5:
+            p["urgency"] = "amber"
+        else:
+            p["urgency"] = "green"
+            
+        p["days_left"] = days_left
+        result.append(p)
+    
+    print(result)
+    return result
+
+
+
 
