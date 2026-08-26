@@ -34,6 +34,14 @@ def get_price(name, category, original_price, days_left, stock, time_of_day):
 
     response_text = message.content[0].text
 
+    # Strip any code fences the model might wrap around the JSON
+    response_text = response_text.strip()
+    if response_text.startswith("```"):
+        response_text = response_text.strip("`")
+        if response_text.startswith("json"):
+            response_text = response_text[4:]
+        response_text = response_text.strip()
+
     result = json.loads(response_text)
     price = result["price"]
     reasoning = result["reasoning"]

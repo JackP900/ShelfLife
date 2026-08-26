@@ -1,10 +1,46 @@
 from flask import Flask, render_template, jsonify, request
 from off_lookup import off_lookup
-from db import add_product, get_products_with_urgency, get_product, update_price, log_price_update
-from datetime import datetime
+from db import init_db, add_product, get_all_products, get_products_with_urgency, get_product, update_price, log_price_update
+from datetime import datetime, timedelta
 from pricing import get_price
+from collections import deque
+import time
 
 app = Flask(__name__)
+
+# Make sure the database and tables exist (the deployed server starts fresh)
+init_db()
+
+
+def seed_demo_data():
+    """Add a few demo products so visitors see a working dashboard."""
+    if get_all_products():
+        return
+
+    def days_from_now(n):
+        return (datetime.now() + timedelta(days=n)).strftime("%Y-%m-%d")
+
+    add_product("0001", "Fresh Milk", "Dairy", 1.20, days_from_now(1), 8)
+    add_product("0002", "Croissant", "Bakery", 1.50, days_from_now(4), 12)
+    add_product("0003", "Cheddar", "Dairy", 3.00, days_from_now(10), 5)
+    add_product("0004", "Chicken Sandwich", "Sandwiches", 3.50, days_from_now(2), 6)
+
+
+seed_demo_data()
+
+# Simple rate limit so a burst of visitors can't drain API credits
+AI_CALLS_PER_HOUR = 30
+_ai_calls = deque()
+
+
+def ai_rate_limited():
+    now = time.time()
+    while _ai_calls and now - _ai_calls[0] > 3600:
+        _ai_calls.popleft()
+    if len(_ai_calls) >= AI_CALLS_PER_HOUR:
+        return True
+    _ai_calls.append(now)
+    return False
 
 @app.route("/")
 def index():
@@ -38,6 +74,9 @@ def lookup(barcode):
 
 @app.route("/reprice/<int:product_id>", methods=["POST"])
 def reprice(product_id):
+    if ai_rate_limited():
+        return jsonify({"error": "The demo has hit its hourly AI limit — try again a bit later."}), 429
+
     product = get_product(product_id)
 
     hour = datetime.now().hour
